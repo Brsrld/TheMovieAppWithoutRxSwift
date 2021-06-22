@@ -20,7 +20,7 @@ class CastPeopleMovieCreditsCollectionViewCell: UICollectionViewCell {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        contentView.addSubview(movieImage)
+      
         setupUI()
         shadowEffect()
     }
@@ -28,14 +28,16 @@ class CastPeopleMovieCreditsCollectionViewCell: UICollectionViewCell {
     // MARK: Functions
     
     private func setupUI() {
+        
+        contentView.addSubview(movieImage)
+        contentView.clipsToBounds = true
+        
         movieImage.frame = CGRect(x: 0, y: 0, width: contentView.frame.size.width , height: contentView.frame.size.height)
     }
     
     private func shadowEffect() {
         movieImage.layer.cornerRadius = 10
         contentView.layer.cornerRadius = 10
-        movieImage.layer.shadowOpacity = 1
-        movieImage.layer.shadowOffset = CGSize(width: 1, height: 1)
     }
     
     func configure (url:String) {

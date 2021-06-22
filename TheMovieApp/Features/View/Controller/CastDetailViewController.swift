@@ -14,7 +14,7 @@ class CastDetailViewController: UIViewController {
     
     var persons:CastPersons?
     
-    private let castDetailViewModel: CastDetailViewModel = CastDetailViewModel()
+    private let castDetailViewModel: CastDetailViewModelProtocol = CastDetailViewModel()
     private let castDetailPeopleMovieCollectionView: CastDetailPeopleMovieCollectionView = CastDetailPeopleMovieCollectionView()
     private let castDetailPeopleTvCollectonView: CastDetailPeopleTvCollectionView = CastDetailPeopleTvCollectionView()
     
@@ -46,7 +46,7 @@ class CastDetailViewController: UIViewController {
         return cv
     }()
     
-    private var personImage: UIImageView = {
+    private let personImage: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleToFill
@@ -119,7 +119,7 @@ class CastDetailViewController: UIViewController {
         return label
     }()
     
-    private var viewforImage: UIView = {
+    private let viewforImage: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.contentMode = .scaleToFill
@@ -127,7 +127,8 @@ class CastDetailViewController: UIViewController {
         return view
     }()
     
-    private var bigImage: UIImageView = {
+    
+    private let bigImage: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleToFill
@@ -139,6 +140,89 @@ class CastDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        setupUI()
+        initdelegate()
+        configureUI()
+        shadowForImage()
+        servicePerson()
+        serviceMovie()
+        serviceTv()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        scrollView.delegate = self
+        scrollView.contentSize = CGSize(width: scrollView.frame.width, height:  UIScreen.main.bounds.height)
+    }
+    
+    //MARK: Functions
+    
+    private func initdelegate() {
+        
+        moviesCollectionView.delegate = castDetailPeopleMovieCollectionView
+        moviesCollectionView.dataSource = castDetailPeopleMovieCollectionView
+        castDetailPeopleMovieCollectionView.delegate = self
+        
+        tVCollectionView.delegate = castDetailPeopleTvCollectonView
+        tVCollectionView.dataSource = castDetailPeopleTvCollectonView
+        castDetailPeopleTvCollectonView.delegate = self
+    }
+    
+    private func servicePerson() {
+        castDetailViewModel.servicePerson(url: "\(Constants.personURL)\(persons?.id ?? 0)\(Constants.personUrlExtend)") { [weak self] models in
+            guard let self = self else { return }
+            if models.biography == Constants.nilValue {
+                self.biographyOverviewLabel.text = "We are sorry there is no biography data."
+            } else {
+                self.biographyOverviewLabel.text = models.biography
+            }
+        } onFail: { error in
+            print(error ?? Constants.nilValue)
+        }
+    }
+    
+    private func configureUI() {
+        nameLabel.text = persons?.name
+        statusLabel.text = persons?.known_for_department
+        let url = "\(Constants.imageUrl)\(persons?.profile_path ?? Constants.nilValue)"
+        if url == Constants.imageUrl {
+            personImage.image = UIImage(named: Constants.actorImageDefault)
+            bigImage.image = UIImage(named: Constants.actorImageDefault)
+        } else {
+            personImage.kf.setImage(with: URL(string: url))
+            bigImage.kf.setImage(with: URL(string: url))
+        }
+    }
+    
+    private func serviceMovie() {
+        castDetailViewModel.serviceCreditsMovie(url: "\(Constants.personCreditsUrl)\(persons?.id ?? 0)\(Constants.personCreditExtension)") { [weak self] models in
+            guard let self = self else { return }
+            self.castDetailPeopleMovieCollectionView.update(items: models)
+            self.moviesCollectionView.reloadData()
+        } onFail: { error in
+            print(error ?? Constants.nilValue)
+        }
+    }
+    
+    private func serviceTv() {
+        castDetailViewModel.serviceCreditsTv(url: "\(Constants.personCreditsUrl)\(persons?.id ?? 0)\(Constants.personCreditTvExtension)") { [weak self] models in
+            guard let self = self else { return }
+            self.castDetailPeopleTvCollectonView.update(items: models)
+            self.tVCollectionView.reloadData()
+        } onFail: { error in
+            print(error ?? Constants.nilValue)
+        }
+    }
+    
+    private func shadowForImage() {
+        personImage.layer.cornerRadius = 10
+        personImage.layer.shadowOpacity = 1
+        personImage.layer.shadowOffset = CGSize(width: 1, height: 1)
+    }
+    
+    private func setupUI() {
         
         view.addSubview(scrollView)
         
@@ -157,84 +241,6 @@ class CastDetailViewController: UIViewController {
         scrollView.backgroundColor = .systemBackground
         viewforImage.backgroundColor = UIColor.white.withAlphaComponent(0.75)
         
-        servicePerson()
-        setupUI()
-        configureUI()
-        shadowForImage()
-        initdelegate()
-        serviceMovie()
-        serviceTv()
-        
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        scrollView.delegate = self
-        scrollView.contentSize = CGSize(width: scrollView.frame.width, height:  UIScreen.main.bounds.height)
-    }
-    
-    //MARK: Functions
-    
-    private func initdelegate() {
-        moviesCollectionView.delegate = castDetailPeopleMovieCollectionView
-        moviesCollectionView.dataSource = castDetailPeopleMovieCollectionView
-        castDetailPeopleMovieCollectionView.delegate = self
-        tVCollectionView.delegate = castDetailPeopleTvCollectonView
-        tVCollectionView.dataSource = castDetailPeopleTvCollectonView
-        castDetailPeopleTvCollectonView.delegate = self
-    }
-    
-    private func servicePerson() {
-        castDetailViewModel.servicePerson(url: "\(Constants.personURL)\(persons?.id ?? 0)\(Constants.personUrlExtend)") { models in
-            if models.biography == Constants.nilValue {
-                self.biographyOverviewLabel.text = "We are sorry there is no biography data."
-            } else {
-                self.biographyOverviewLabel.text = models.biography
-            }
-        } onFail: { error in
-            print(error ?? Constants.nilValue)
-        }
-    }
-    
-    private func configureUI() {
-        nameLabel.text = persons?.name
-        statusLabel.text = persons?.known_for_department
-        let url = "\(Constants.imageUrl)\(persons?.profile_path ?? Constants.nilValue)"
-        if url == Constants.imageUrl {
-            personImage.image = UIImage(named: Constants.actorImageDefault)
-            bigImage.image = UIImage(named: Constants.actorImageDefault)
-        }else {
-            personImage.kf.setImage(with: URL(string: url))
-            bigImage.kf.setImage(with: URL(string: url))
-        }
-    }
-    
-    private func serviceMovie() {
-        castDetailViewModel.serviceCreditsMovie(url: "\(Constants.personCreditsUrl)\(persons?.id ?? 0)\(Constants.personCreditExtension)") { models in
-            self.castDetailPeopleMovieCollectionView.update(items: models)
-            self.moviesCollectionView.reloadData()
-        } onFail: { error in
-            print(error ?? Constants.nilValue)
-        }
-    }
-    
-    private func serviceTv() {
-        castDetailViewModel.serviceCreditsTv(url: "\(Constants.personCreditsUrl)\(persons?.id ?? 0)\(Constants.personCreditTvExtension)") { models in
-            self.castDetailPeopleTvCollectonView.update(items: models)
-            self.tVCollectionView.reloadData()
-        } onFail: { error in
-            print(error ?? Constants.nilValue)
-        }
-    }
-    
-    private func shadowForImage() {
-        personImage.layer.cornerRadius = 10
-        personImage.layer.shadowOpacity = 1
-        personImage.layer.shadowOffset = CGSize(width: 1, height: 1)
-    }
-    
-    private func setupUI() {
-        
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -243,19 +249,19 @@ class CastDetailViewController: UIViewController {
         bigImage.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
         bigImage.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         bigImage.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        bigImage.heightAnchor.constraint(equalToConstant: view.frame.height / 2.1).isActive = true
+        bigImage.heightAnchor.constraint(equalToConstant: view.frame.height / 1.9).isActive = true
         
         viewforImage.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
         viewforImage.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         viewforImage.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        viewforImage.heightAnchor.constraint(equalToConstant: view.frame.height / 2.1).isActive = true
+        viewforImage.heightAnchor.constraint(equalToConstant: view.frame.height / 1.9).isActive = true
         
-        personImage.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 50).isActive = true
+        personImage.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 60).isActive = true
         personImage.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 100).isActive = true
         personImage.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -100).isActive = true
         personImage.heightAnchor.constraint(equalToConstant: view.frame.height / 3).isActive = true
         
-        nameLabel.topAnchor.constraint(equalTo: personImage.bottomAnchor, constant: 20).isActive = true
+        nameLabel.topAnchor.constraint(equalTo: personImage.bottomAnchor, constant: 10).isActive = true
         nameLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 50).isActive = true
         nameLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -50).isActive = true
         
@@ -263,7 +269,7 @@ class CastDetailViewController: UIViewController {
         statusLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 50).isActive = true
         statusLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -50).isActive = true
         
-        biographyLabel.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 30).isActive = true
+        biographyLabel.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 60).isActive = true
         biographyLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10).isActive = true
         biographyLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive = true
         
@@ -288,13 +294,19 @@ class CastDetailViewController: UIViewController {
         tVCollectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10).isActive = true
         tVCollectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive = true
         tVCollectionView.heightAnchor.constraint(equalToConstant: view.frame.height / 5).isActive = true
-        tVCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -20).isActive = true
+        tVCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -30).isActive = true
     }
 }
 
-//MARK: Extensions
+//MARK: - UIScrollViewDelegate
 
 extension CastDetailViewController: UIScrollViewDelegate {}
+
+//MARK: - CastDetailPeopleMovieCollectionViewOutput
+
 extension CastDetailViewController:  CastDetailPeopleMovieCollectionViewOutput {}
+
+//MARK: - CastDetailPeopleTvCollectionViewOutput
+
 extension CastDetailViewController:  CastDetailPeopleTvCollectionViewOutput {}
 

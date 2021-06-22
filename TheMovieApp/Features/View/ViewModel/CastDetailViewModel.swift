@@ -17,7 +17,7 @@ protocol CastDetailViewModelProtocol {
 
 //MARK: Model Logic
 
-final class CastDetailViewModel:NSObject {
+final class CastDetailViewModel {
     
     private let castDetailViewModelService: MostPopularModelServiceProtocol = MostPopularModelService()
     

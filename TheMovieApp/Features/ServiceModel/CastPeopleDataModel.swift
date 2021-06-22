@@ -7,7 +7,7 @@
 
 import Foundation
 
-//MARK: Model
+//MARK: CastPeople Model
 
 struct CastPeople: Codable {
     let biography: String?

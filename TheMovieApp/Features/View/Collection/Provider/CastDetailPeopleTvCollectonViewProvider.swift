@@ -39,25 +39,28 @@ final class CastDetailPeopleTvCollectionView: NSObject{
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-                return 20
-            }
-            
-            func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-                let columns: CGFloat = 1.2
-                let collectionViewWidth = collectionView.bounds.width
-                let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-                let spaceBetweenCells = flowLayout.minimumInteritemSpacing * (columns - 1)
-                let sectionInsets = flowLayout.sectionInset.left + flowLayout.sectionInset.right
-                let adjustedWidth = collectionViewWidth - spaceBetweenCells - sectionInsets
-                let width: CGFloat = floor(adjustedWidth / columns)
-                let height: CGFloat = width / 2
-                return CGSize(width: height / 1.5, height: width / 2)
-            }
+        return 20
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let columns: CGFloat = 1.2
+        let collectionViewWidth = collectionView.bounds.width
+        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
+        let spaceBetweenCells = flowLayout.minimumInteritemSpacing * (columns - 1)
+        let sectionInsets = flowLayout.sectionInset.left + flowLayout.sectionInset.right
+        let adjustedWidth = collectionViewWidth - spaceBetweenCells - sectionInsets
+        let width: CGFloat = floor(adjustedWidth / columns)
+        let height: CGFloat = width / 2
+        return CGSize(width: height / 1.8, height: width / 2.3)
+    }
 }
 
-//MARK: Extensions
+//MARK: - UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
 
 extension CastDetailPeopleTvCollectionView: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {}
+
+//MARK: - CastDetailPeopleTvCollectionViewProtocol
+
 extension CastDetailPeopleTvCollectionView: CastDetailPeopleTvCollectionViewProtocol {
     func update (items: [PeopleTvCredits]) {
         self.items = items

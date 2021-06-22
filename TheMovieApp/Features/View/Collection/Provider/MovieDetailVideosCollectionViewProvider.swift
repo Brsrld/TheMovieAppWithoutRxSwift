@@ -51,9 +51,12 @@ final class MovieDetailVideosCollectionView: NSObject{
     }
 }
 
-//MARK: Extensions
+//MARK: - UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
 
 extension MovieDetailVideosCollectionView: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {}
+
+//MARK: - MovieDetailVideosCollectionViewProtocol
+
 extension MovieDetailVideosCollectionView: MovieDetailVideosCollectionViewProtocol {
     func update (items: [MovieVideos]) {
         self.items = items

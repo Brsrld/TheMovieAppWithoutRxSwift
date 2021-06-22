@@ -23,19 +23,17 @@ class MovieDetailCastCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.clipsToBounds = true
-        label.font = UIFont.systemFont(ofSize: 20)
+        label.font = UIFont.systemFont(ofSize: 15)
         label.textColor = .black
         label.textAlignment = .left
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         return label
     }()
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        contentView.addSubview(actorImage)
-        contentView.addSubview(actorNameLabel)
-        contentView.backgroundColor = .systemBackground
+      
         
         setupUI()
         shadowEffect()
@@ -44,7 +42,12 @@ class MovieDetailCastCollectionViewCell: UICollectionViewCell {
     // MARK: Functions
     
     private func setupUI() {
-        actorImage.frame = CGRect(x:0, y: 0, width: contentView.frame.size.width, height: contentView.frame.size.height / 1.2)
+        
+        contentView.addSubview(actorImage)
+        contentView.addSubview(actorNameLabel)
+        contentView.backgroundColor = .systemBackground
+        
+        actorImage.frame = CGRect(x:0, y:0, width: contentView.frame.size.width, height: contentView.frame.size.height / 1.2)
         actorNameLabel.frame = CGRect(x:0, y: actorImage.frame.height, width: contentView.frame.size.width, height: contentView.frame.size.height - actorImage.frame.size.height )
     }
     

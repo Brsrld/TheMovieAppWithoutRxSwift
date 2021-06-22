@@ -11,11 +11,12 @@ import Foundation
 
 protocol MovieDetailViewModelProtocol {
     func castService(url:String, onSuccess: @escaping ([CastPersons]) -> Void, onFail: @escaping (String?) -> Void)
+    func videoService(url:String, onSuccess: @escaping ([MovieVideos]) -> Void, onFail: @escaping (String?) -> Void) 
 }
 
 //MARK: Model Logic
 
-final class MovieDetailViewModel:NSObject {
+final class MovieDetailViewModel {
     
     private let movieDetailViewModelService: MostPopularModelServiceProtocol = MostPopularModelService()
     

@@ -11,7 +11,7 @@ class MostPopularMovieViewController: UIViewController {
     
     //MARK: Variables
     
-    private var mostPopularMovieViewModel: MostPopularMovieViewModel = MostPopularMovieViewModel()
+    private var mostPopularMovieViewModel: MostPopularMovieViewModelProtocol = MostPopularMovieViewModel()
     private let mostPopularMovieCollecionView: MostPopularMovieCollecionView = MostPopularMovieCollecionView()
     
     lazy var searchBar:UISearchBar = UISearchBar()
@@ -26,7 +26,7 @@ class MostPopularMovieViewController: UIViewController {
         return scroll
     }()
     
-    let mostPopularCollectionView:UICollectionView = {
+    let mostPopularCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -52,21 +52,16 @@ class MostPopularMovieViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addSubview(scrollView)
-        view.backgroundColor = .white
-        
-        scrollView.addSubview(mostPopularCollectionView)
-        scrollView.addSubview(titleLabel)
-        
-        service()
-        initDelegate()
         setupUI()
+        initDelegate()
         navigationBarSetup()
+        service()
         setIndicator()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        
         mostPopularCollectionView.contentSize = CGSize(width: mostPopularCollectionView.frame.width, height:  UIScreen.main.bounds.height)
         scrollView.delegate = self
         scrollView.contentSize = CGSize(width: scrollView.frame.width, height:  UIScreen.main.bounds.height)
@@ -76,7 +71,8 @@ class MostPopularMovieViewController: UIViewController {
     
     private func service() {
         
-        mostPopularMovieViewModel.service(url: Constants.popularMovieUrl) { models in
+        mostPopularMovieViewModel.service(url: Constants.popularMovieUrl) { [weak self] models in
+            guard let self = self else { return }
             self.allMovies = models
             self.mostPopularMovieCollecionView.update(items: models)
             self.mostPopularCollectionView.reloadData()
@@ -105,6 +101,12 @@ class MostPopularMovieViewController: UIViewController {
     
     private func setupUI() {
         
+        view.addSubview(scrollView)
+        view.backgroundColor = .white
+        
+        scrollView.addSubview(mostPopularCollectionView)
+        scrollView.addSubview(titleLabel)
+        
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -118,7 +120,6 @@ class MostPopularMovieViewController: UIViewController {
         titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor , constant: 10).isActive = true
         titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        
     }
     
     private func setIndicator() {
@@ -130,26 +131,26 @@ class MostPopularMovieViewController: UIViewController {
     }
 }
 
-//MARK: Extensions
+//MARK: - MostPopularMovieCollecionViewOutput
 
-extension MostPopularMovieViewController: MostPopularMovieCollecionViewOutput{
-    
+extension MostPopularMovieViewController: MostPopularMovieCollecionViewOutput {
     func getNavCont() -> UINavigationController? {
         return navigationController
     }
 }
 
+//MARK: - UISearchBarDelegate
+
 extension MostPopularMovieViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         searchedMovie = allMovies.filter({($0.original_title?.prefix(searchText.count))! == searchText})
-        if searchedMovie.count == 0 {
-            
-        }else {
+        if searchedMovie.count != 0 {
             mostPopularMovieCollecionView.update(items: searchedMovie)
             mostPopularCollectionView.reloadData()
         }
-        
     }
 }
+
+//MARK: - UIScrollViewDelegate
 
 extension MostPopularMovieViewController: UIScrollViewDelegate {}

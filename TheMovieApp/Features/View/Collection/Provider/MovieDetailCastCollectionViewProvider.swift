@@ -59,13 +59,16 @@ final class MovieDetailCastCollectionView: NSObject{
         let adjustedWidth = collectionViewWidth - spaceBetweenCells - sectionInsets
         let width: CGFloat = floor(adjustedWidth / columns)
         let height: CGFloat = width / 2
-        return CGSize(width: height, height: width)
+        return CGSize(width: height , height: width / 1.2)
     }
 }
 
-//MARK: Extensions
+//MARK: - UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
 
 extension MovieDetailCastCollectionView: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {}
+
+//MARK: - MovieDetailCastCollectionViewProtocol
+
 extension MovieDetailCastCollectionView: MovieDetailCastCollectionViewProtocol {
     func update (items: [CastPersons]) {
         self.items = items

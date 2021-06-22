@@ -7,7 +7,7 @@
 
 import Foundation
 
-//MARK: Model
+//MARK: PeopleTvCredits Model
 
 struct PeopleTvCredits: Codable {
     let poster_path: String?

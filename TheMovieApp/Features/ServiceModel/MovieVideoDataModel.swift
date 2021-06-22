@@ -7,7 +7,7 @@
 
 import Foundation
 
-//MARK: Model
+//MARK: MovieVideos Model
 
 struct MovieVideos: Codable {
     let key: String?

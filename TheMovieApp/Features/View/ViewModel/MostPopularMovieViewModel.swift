@@ -15,7 +15,7 @@ protocol MostPopularMovieViewModelProtocol {
 
 //MARK: Model Logic
 
-final class MostPopularMovieViewModel:NSObject {
+final class MostPopularMovieViewModel {
     
     private let mostPopularModelService: MostPopularModelServiceProtocol = MostPopularModelService()
     

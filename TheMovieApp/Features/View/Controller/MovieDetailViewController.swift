@@ -14,7 +14,7 @@ class MovieDetailViewController: UIViewController {
     
     //MARK: Variables
     
-    private var movieDetailViewModel: MovieDetailViewModel = MovieDetailViewModel()
+    private var movieDetailViewModel: MovieDetailViewModelProtocol = MovieDetailViewModel()
     private let movieDetailCastCollecionView: MovieDetailCastCollectionView = MovieDetailCastCollectionView()
     private let movieDetailVideosCollectionView: MovieDetailVideosCollectionView = MovieDetailVideosCollectionView()
     
@@ -152,27 +152,12 @@ class MovieDetailViewController: UIViewController {
         
         view.addSubview(scrollView)
         
-        scrollView.addSubview(bigImage)
-        scrollView.addSubview(viewforImage)
-        scrollView.addSubview(titleLabel)
-        scrollView.addSubview(overviewLabel)
-        scrollView.addSubview(movieImage)
-        scrollView.addSubview(rateStar)
-        scrollView.addSubview(summaryLabel)
-        scrollView.addSubview(videosLabel)
-        scrollView.addSubview(videosCollectionView)
-        scrollView.addSubview(castsLabel)
-        scrollView.addSubview(castsCollectionView)
-        
-        rateStar.centerInSuperview()
-        
-        viewforImage.backgroundColor = UIColor.white.withAlphaComponent(0.75)
-        
         setupUI()
+        initDelegate()
+        service()
         shadowForImage()
         configureItems()
         service()
-        initDelegate()
     }
     
     override func viewDidLayoutSubviews() {
@@ -180,21 +165,21 @@ class MovieDetailViewController: UIViewController {
         
         scrollView.delegate = self
         scrollView.contentSize = CGSize(width: scrollView.frame.width, height:  UIScreen.main.bounds.height)
-        
-        setupUI()
     }
     
     //MARK: Functions
     
     private func service() {
         
-        movieDetailViewModel.castService(url: "\(Constants.urlforCast)\(moviesDetail?.id ?? 0)\(Constants.credistExtension)") { models in
+        movieDetailViewModel.castService(url: "\(Constants.urlforCast)\(moviesDetail?.id ?? 0)\(Constants.credistExtension)") { [weak self] models in
+            guard let self = self else { return }
             self.movieDetailCastCollecionView.update(items: models)
             self.castsCollectionView.reloadData()
         } onFail: { error in
             print(error ?? Constants.nilValue)
         }
-        movieDetailViewModel.videoService(url: "\(Constants.urlforCast)\(moviesDetail?.id ?? 0)\(Constants.videoExtend)") { models in
+        movieDetailViewModel.videoService(url: "\(Constants.urlforCast)\(moviesDetail?.id ?? 0)\(Constants.videoExtend)") { [weak self] models in
+            guard let self = self else { return }
             self.movieDetailVideosCollectionView.update(items: models)
             self.videosCollectionView.reloadData()
         } onFail: { error in
@@ -226,6 +211,22 @@ class MovieDetailViewController: UIViewController {
     
     private func setupUI() {
         
+        scrollView.addSubview(bigImage)
+        scrollView.addSubview(viewforImage)
+        scrollView.addSubview(titleLabel)
+        scrollView.addSubview(overviewLabel)
+        scrollView.addSubview(movieImage)
+        scrollView.addSubview(rateStar)
+        scrollView.addSubview(summaryLabel)
+        scrollView.addSubview(videosLabel)
+        scrollView.addSubview(videosCollectionView)
+        scrollView.addSubview(castsLabel)
+        scrollView.addSubview(castsCollectionView)
+        
+        rateStar.centerInSuperview()
+        
+        viewforImage.backgroundColor = UIColor.white.withAlphaComponent(0.75)
+        
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -241,14 +242,15 @@ class MovieDetailViewController: UIViewController {
         viewforImage.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
         viewforImage.heightAnchor.constraint(equalToConstant: view.frame.height / 1.9).isActive = true
         
-        movieImage.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 40).isActive = true
+        movieImage.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 30).isActive = true
         movieImage.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 100).isActive = true
         movieImage.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -100).isActive = true
         movieImage.heightAnchor.constraint(equalToConstant: view.frame.height / 2.75).isActive = true
         
-        titleLabel.topAnchor.constraint(equalTo: movieImage.bottomAnchor, constant: 20).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: movieImage.bottomAnchor, constant: 10).isActive = true
         titleLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
         titleLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: rateStar.topAnchor, constant: -10).isActive = true
         
         summaryLabel.topAnchor.constraint(equalTo: rateStar.bottomAnchor, constant: 30).isActive = true
         summaryLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10).isActive = true
@@ -276,16 +278,21 @@ class MovieDetailViewController: UIViewController {
         castsCollectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive = true
         castsCollectionView.heightAnchor.constraint(equalToConstant: view.frame.height / 3.2).isActive = true
         castsCollectionView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -20).isActive = true
-        
     }
 }
 
-//MARK: Extension
+//MARK: - UIScrollViewDelegate
 
-extension MovieDetailViewController:UIScrollViewDelegate {}
-extension MovieDetailViewController:MovieDetailCastCollectionViewViewOutput{
+extension MovieDetailViewController: UIScrollViewDelegate {}
+
+//MARK: - MovieDetailCastCollectionViewViewOutput
+
+extension MovieDetailViewController: MovieDetailCastCollectionViewViewOutput{
     func getNavCont() -> UINavigationController? {
         return navigationController
     }
 }
-extension MovieDetailViewController:MovieDetailVideosCollectionViewOutput{}
+
+//MARK: - MovieDetailVideosCollectionViewOutput
+
+extension MovieDetailViewController: MovieDetailVideosCollectionViewOutput{}

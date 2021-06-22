@@ -175,7 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				55FB9074267AA1B0008EF444 /* Controller */,
-				55FB9073267AA1AB008EF444 /* Model */,
+				55FB9073267AA1AB008EF444 /* ViewModel */,
 				55FB9072267AA199008EF444 /* Collection */,
 			);
 			path = View;
@@ -190,14 +190,14 @@
 			path = Collection;
 			sourceTree = "<group>";
 		};
-		55FB9073267AA1AB008EF444 /* Model */ = {
+		55FB9073267AA1AB008EF444 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
 				55FB907D267AA8B7008EF444 /* MostPopularMovieViewModel.swift */,
 				5502E5FF267CD2D200F8BB0C /* MovieDetailViewModel.swift */,
 				553E23C8267E031A00B54CBB /* CastDetailViewModel.swift */,
 			);
-			path = Model;
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		55FB9074267AA1B0008EF444 /* Controller */ = {

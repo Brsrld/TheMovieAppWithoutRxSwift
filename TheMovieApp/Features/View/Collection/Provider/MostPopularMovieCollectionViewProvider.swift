@@ -63,9 +63,12 @@ final class MostPopularMovieCollecionView: NSObject{
     }
 }
 
-//MARK: Extensions
+//MARK:  - UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
 
 extension MostPopularMovieCollecionView: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout {}
+
+//MARK:  - MostPopularMovieCollecionViewProtocol
+
 extension MostPopularMovieCollecionView: MostPopularMovieCollecionViewProtocol {
     func update (items: [MostPopularMovie]) {
         self.items = items
